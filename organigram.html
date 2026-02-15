@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arctos Organizational Chart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #FAFAF5;
+      color: #334155;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    #header {
+      padding: 20px 32px 0;
+      background: #FAFAF5;
+    }
+
+    #header h1 {
+      font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #1E40AF;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Legend bar ── */
+    #legend {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 12px 32px;
+      background: #FAFAF5;
+      flex-wrap: wrap;
+    }
+
+    .legend-items {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: #334155;
+    }
+
+    .legend-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .legend-summary {
+      font-size: 0.8125rem;
+      color: #94A3B8;
+      margin-left: 8px;
+    }
+
+    .legend-summary span { color: #334155; font-weight: 500; }
+
+    /* ── Chart container ── */
+    #chart-container {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #chart {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── Controls bar ── */
+    #controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 32px;
+      background: #FAFAF5;
+      border-top: 1px solid #E2E8F0;
+      flex-wrap: wrap;
+    }
+
+    .ctrl-btn {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 6px 16px;
+      border: 1px solid #CBD5E1;
+      border-radius: 6px;
+      background: #FFFFFF;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .ctrl-btn:hover {
+      background: #F1F5F9;
+      border-color: #94A3B8;
+    }
+
+    .ctrl-btn:active {
+      background: #E2E8F0;
+    }
+
+    .ctrl-btn.active {
+      background: #1E40AF;
+      color: #FFFFFF;
+      border-color: #1E40AF;
+    }
+
+    .ctrl-btn.active:hover {
+      background: #1D4ED8;
+    }
+
+    /* ── Footer ── */
+    #footer {
+      padding: 8px 32px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #94A3B8;
+      background: #FAFAF5;
+    }
+
+    /* ── Tooltip ── */
+    #tooltip {
+      position: fixed;
+      display: none;
+      background: #0F172A;
+      color: #F8FAFC;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      max-width: 300px;
+      pointer-events: none;
+      z-index: 9999;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+
+    #tooltip .tt-title {
+      font-weight: 600;
+      font-size: 0.8125rem;
+      margin-bottom: 4px;
+      color: #F8FAFC;
+    }
+
+    #tooltip .tt-label {
+      color: #94A3B8;
+      font-size: 0.6875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+
+    #tooltip .tt-agent {
+      color: #E2E8F0;
+      padding-left: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div id="header">
+    <h1>Arctos Organizational Chart</h1>
+  </div>
+
+  <!-- Legend -->
+  <div id="legend">
+    <div class="legend-items">
+      <div class="legend-item">
+        <div class="legend-swatch" style="background: #2E8B57;"></div>
+        Human
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background: #0D5C63;"></div>
+        Hybrid
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background: #00B894;"></div>
+        AI
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background: #1E1B4B;"></div>
+        Holding
+      </div>
+    </div>
+    <div class="legend-summary">
+      <span>4</span> Human &middot; <span>26</span> Hybrid &middot; <span>3</span> AI &middot; <span>1</span> Holding &middot; <span>34</span> Total
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div id="chart-container">
+    <div id="chart"></div>
+  </div>
+
+  <!-- Controls -->
+  <div id="controls">
+    <button class="ctrl-btn" onclick="chart.expandAll().fit()">Expand All</button>
+    <button class="ctrl-btn" onclick="chart.collapseAll().fit()">Collapse All</button>
+    <button class="ctrl-btn" onclick="chart.fit()">Fit</button>
+    <button class="ctrl-btn" id="compactBtn" onclick="toggleCompact()">Compact</button>
+    <button class="ctrl-btn" onclick="exportChart()">Export PNG</button>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer">
+    Part of <strong>Arctos</strong>, a <strong>jeannAI</strong> company &middot; AI-native organizational structure
+  </div>
+
+  <!-- Tooltip -->
+  <div id="tooltip"></div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-flextree@2.1.2/build/d3-flextree.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-org-chart@3.1.1"></script>
+  <script>
+    // ── Set chart container height ──
+    function setChartHeight() {
+      var header = document.getElementById('header');
+      var legend = document.getElementById('legend');
+      var controls = document.getElementById('controls');
+      var footer = document.getElementById('footer');
+      var container = document.getElementById('chart-container');
+      var used = header.offsetHeight + legend.offsetHeight + controls.offsetHeight + footer.offsetHeight;
+      container.style.height = (window.innerHeight - used) + 'px';
+    }
+    setChartHeight();
+
+    // ── Org Data (34 nodes: 33 Arctos + 1 holding context) ──
+    const data = [
+      // ── Holding context node (jeannAI) ──
+      {
+        id: "ceo",
+        parentId: "",
+        title: "Chief Executive Officer",
+        shortTitle: "CEO",
+        department: "jeannAI",
+        classification: "holding",
+        level: "c-suite",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      // ── Arctos roles (32) ──
+      // Leadership
+      {
+        id: "arctos-md",
+        parentId: "ceo",
+        title: "Arctos Managing Director",
+        shortTitle: "Arctos MD",
+        department: "C-Suite",
+        classification: "human",
+        level: "c-suite",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      // Investment / Front Office
+      {
+        id: "arctos-cio",
+        parentId: "arctos-md",
+        title: "Chief Investment Officer",
+        shortTitle: "Arctos CIO",
+        department: "Investment",
+        classification: "human",
+        level: "c-suite",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "pm-multi-asset",
+        parentId: "arctos-cio",
+        title: "Portfolio Manager — Multi-Asset",
+        shortTitle: "PM Multi-Asset",
+        department: "Investment",
+        classification: "hybrid",
+        level: "senior",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "pm-alternatives",
+        parentId: "arctos-cio",
+        title: "Portfolio Manager — Alternatives/Crypto",
+        shortTitle: "PM Alts/Crypto",
+        department: "Investment",
+        classification: "hybrid",
+        level: "senior",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "pm-fixed-income",
+        parentId: "arctos-cio",
+        title: "Portfolio Manager — Fixed Income",
+        shortTitle: "PM Fixed Income",
+        department: "Investment",
+        classification: "hybrid",
+        level: "senior",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "quant-analyst-alpha",
+        parentId: "arctos-cio",
+        title: "Quantitative Analyst — Alpha Research",
+        shortTitle: "QA Alpha",
+        department: "Investment",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "quant-analyst-factors",
+        parentId: "arctos-cio",
+        title: "Quantitative Analyst — Factor Models",
+        shortTitle: "QA Factors",
+        department: "Investment",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "research-analyst-fundamental",
+        parentId: "arctos-cio",
+        title: "Research Analyst — Fundamental",
+        shortTitle: "RA Fundamental",
+        department: "Investment",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "research-analyst-macro",
+        parentId: "arctos-cio",
+        title: "Research Analyst — Macro",
+        shortTitle: "RA Macro",
+        department: "Investment",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-trader",
+        parentId: "arctos-cio",
+        title: "Trader / Execution Specialist",
+        shortTitle: "Trader",
+        department: "Investment",
+        classification: "hybrid",
+        level: "senior",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      // Knowledge
+      {
+        id: "arctos-librarian",
+        parentId: "arctos-cio",
+        title: "Librarian / Knowledge Manager",
+        shortTitle: "Librarian",
+        department: "Investment",
+        classification: "ai",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      // Risk & Compliance
+      {
+        id: "arctos-head-of-risk",
+        parentId: "arctos-md",
+        title: "Head of Risk",
+        shortTitle: "Head of Risk",
+        department: "Risk",
+        classification: "human",
+        level: "director",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-risk-analyst",
+        parentId: "arctos-head-of-risk",
+        title: "Risk Analyst",
+        shortTitle: "Risk Analyst",
+        department: "Risk",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-compliance-officer",
+        parentId: "arctos-head-of-risk",
+        title: "Investment Compliance Officer",
+        shortTitle: "Compliance Ofc",
+        department: "Risk",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-model-validation",
+        parentId: "arctos-head-of-risk",
+        title: "Model Validation Specialist",
+        shortTitle: "Model Val.",
+        department: "Risk",
+        classification: "ai",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      // Technology
+      {
+        id: "arctos-tech-lead",
+        parentId: "arctos-md",
+        title: "Arctos Tech Lead",
+        shortTitle: "Arctos TL",
+        department: "Engineering",
+        classification: "hybrid",
+        level: "lead",
+        linkedAgents: 2,
+        agentList: "code-review, architecture"
+      },
+      {
+        id: "arctos-data-specialist",
+        parentId: "arctos-tech-lead",
+        title: "Data Specialist / Head of Data",
+        shortTitle: "Head of Data",
+        department: "Engineering",
+        classification: "hybrid",
+        level: "senior",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-data-engineer",
+        parentId: "arctos-tech-lead",
+        title: "Data Engineer",
+        shortTitle: "Data Eng",
+        department: "Engineering",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "quant-developer",
+        parentId: "arctos-tech-lead",
+        title: "Quant Developer",
+        shortTitle: "Quant Dev",
+        department: "Engineering",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 1,
+        agentList: "code-review"
+      },
+      {
+        id: "arctos-trading-systems-dev",
+        parentId: "arctos-tech-lead",
+        title: "Trading Systems Developer",
+        shortTitle: "Trading Sys Dev",
+        department: "Engineering",
+        classification: "hybrid",
+        level: "senior",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-devops-engineer",
+        parentId: "arctos-tech-lead",
+        title: "Infrastructure / DevOps Engineer",
+        shortTitle: "Arctos DevOps",
+        department: "Engineering",
+        classification: "hybrid",
+        level: "senior",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-frontend-engineer",
+        parentId: "arctos-tech-lead",
+        title: "Arctos Frontend Engineer",
+        shortTitle: "Arctos FE",
+        department: "Engineering",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 2,
+        agentList: "code-review, component-library"
+      },
+      // Operations
+      {
+        id: "arctos-head-of-ops",
+        parentId: "arctos-md",
+        title: "Head of Operations",
+        shortTitle: "Head of Ops",
+        department: "Operations",
+        classification: "hybrid",
+        level: "director",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-trade-ops-analyst",
+        parentId: "arctos-head-of-ops",
+        title: "Trade Operations Analyst",
+        shortTitle: "Trade Ops",
+        department: "Operations",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-fund-accounting",
+        parentId: "arctos-head-of-ops",
+        title: "Fund Accounting / NAV Specialist",
+        shortTitle: "Fund Acctg",
+        department: "Operations",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-performance-analyst",
+        parentId: "arctos-head-of-ops",
+        title: "Performance Analyst",
+        shortTitle: "Perf Analyst",
+        department: "Operations",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-reporting-specialist",
+        parentId: "arctos-head-of-ops",
+        title: "Reporting Specialist",
+        shortTitle: "Reporting",
+        department: "Operations",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      // Distribution
+      {
+        id: "arctos-sales-director",
+        parentId: "arctos-md",
+        title: "Arctos Sales Director",
+        shortTitle: "Arctos Sales Dir",
+        department: "Marketing & Sales",
+        classification: "human",
+        level: "director",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-ir-manager",
+        parentId: "arctos-sales-director",
+        title: "Investor Relations Manager",
+        shortTitle: "IR Manager",
+        department: "Marketing & Sales",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-product-specialist",
+        parentId: "arctos-sales-director",
+        title: "Product Specialist",
+        shortTitle: "Product Spec.",
+        department: "Marketing & Sales",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-biz-dev-analyst",
+        parentId: "arctos-sales-director",
+        title: "Business Development Analyst",
+        shortTitle: "Biz Dev",
+        department: "Marketing & Sales",
+        classification: "ai",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      {
+        id: "arctos-rfp-specialist",
+        parentId: "arctos-sales-director",
+        title: "RfP Specialist",
+        shortTitle: "RfP Specialist",
+        department: "Marketing & Sales",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      },
+      // Cross-functional
+      {
+        id: "arctos-esg-analyst",
+        parentId: "arctos-md",
+        title: "ESG / Sustainability Analyst",
+        shortTitle: "ESG Analyst",
+        department: "Investment",
+        classification: "hybrid",
+        level: "mid",
+        linkedAgents: 0,
+        agentList: ""
+      }
+    ];
+
+    // ── Color config ──
+    const classColors = {
+      human:   "#2E8B57",
+      hybrid:  "#0D5C63",
+      ai:      "#00B894",
+      holding: "#1E1B4B"
+    };
+
+    const classLabels = {
+      human:   "Human",
+      hybrid:  "Hybrid",
+      ai:      "AI",
+      holding: "jeannAI"
+    };
+
+    // ── State ──
+    let isCompact = false;
+
+    // ── Tooltip ──
+    const tooltip = document.getElementById("tooltip");
+
+    function showTooltip(evt, d) {
+      if (!d.agentList) { tooltip.style.display = "none"; return; }
+      const agents = d.agentList.split(", ");
+      tooltip.innerHTML =
+        '<div class="tt-title">' + d.title + '</div>' +
+        '<div class="tt-label">Linked Agents</div>' +
+        agents.map(a => '<div class="tt-agent">&bull; ' + a + '</div>').join("");
+      tooltip.style.display = "block";
+      positionTooltip(evt);
+    }
+
+    function positionTooltip(evt) {
+      const pad = 12;
+      let x = evt.clientX + pad;
+      let y = evt.clientY + pad;
+      const tw = tooltip.offsetWidth;
+      const th = tooltip.offsetHeight;
+      if (x + tw > window.innerWidth - pad) x = evt.clientX - tw - pad;
+      if (y + th > window.innerHeight - pad) y = evt.clientY - th - pad;
+      tooltip.style.left = x + "px";
+      tooltip.style.top = y + "px";
+    }
+
+    function hideTooltip() {
+      tooltip.style.display = "none";
+    }
+
+    // ── Node content renderers ──
+    function fullNodeContent(d) {
+      const o = d.data;
+      const color = classColors[o.classification];
+      const label = classLabels[o.classification];
+      const levelDisplay = o.level.replace("-", " ").replace(/\b\w/g, c => c.toUpperCase());
+      const agentBadge = o.linkedAgents > 0
+        ? '<span style="background:' + color + '22; color:' + color + '; padding:1px 7px; border-radius:4px; font-size:11px; font-weight:500;">' + o.linkedAgents + ' agent' + (o.linkedAgents > 1 ? 's' : '') + '</span>'
+        : '<span style="color:#94A3B8; font-size:11px;">No agents</span>';
+
+      return '<div style="' +
+        'width:' + d.width + 'px;' +
+        'height:' + d.height + 'px;' +
+        'display:flex;' +
+        'align-items:center;' +
+        'justify-content:center;' +
+        '">' +
+        '<div style="' +
+          'width:' + (d.width - 4) + 'px;' +
+          'height:' + (d.height - 16) + 'px;' +
+          'background:#FFFFFF;' +
+          'border-radius:8px;' +
+          'border-left:4px solid ' + color + ';' +
+          'box-shadow:0 1px 4px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.04);' +
+          'padding:12px 14px;' +
+          'display:flex;' +
+          'flex-direction:column;' +
+          'justify-content:space-between;' +
+          'font-family:Inter,system-ui,sans-serif;' +
+          'overflow:hidden;' +
+        '">' +
+          '<!-- Badge -->' +
+          '<div style="display:flex; align-items:center; justify-content:space-between;">' +
+            '<span style="' +
+              'display:inline-block;' +
+              'background:' + color + ';' +
+              'color:#FFFFFF;' +
+              'font-size:10px;' +
+              'font-weight:600;' +
+              'padding:2px 8px;' +
+              'border-radius:10px;' +
+              'text-transform:uppercase;' +
+              'letter-spacing:0.04em;' +
+            '">' + label + '</span>' +
+            agentBadge +
+          '</div>' +
+          '<!-- Title -->' +
+          '<div style="' +
+            'font-family:Outfit,Inter,system-ui,sans-serif;' +
+            'font-size:13px;' +
+            'font-weight:600;' +
+            'color:#0F172A;' +
+            'line-height:1.3;' +
+            'margin-top:6px;' +
+          '">' + o.title + '</div>' +
+          '<!-- Department -->' +
+          '<div style="font-size:11px; color:#64748B; margin-top:2px;">' + o.department + '</div>' +
+          '<!-- Meta -->' +
+          '<div style="' +
+            'display:flex;' +
+            'justify-content:space-between;' +
+            'font-size:11px;' +
+            'color:#94A3B8;' +
+            'margin-top:auto;' +
+            'padding-top:6px;' +
+            'border-top:1px solid #F1F5F9;' +
+          '">' +
+            '<span>Level: ' + levelDisplay + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    function compactNodeContent(d) {
+      const o = d.data;
+      const color = classColors[o.classification];
+      const label = classLabels[o.classification];
+
+      return '<div style="' +
+        'width:' + d.width + 'px;' +
+        'height:' + d.height + 'px;' +
+        'display:flex;' +
+        'align-items:center;' +
+        'justify-content:center;' +
+        '">' +
+        '<div style="' +
+          'width:' + (d.width - 4) + 'px;' +
+          'height:' + (d.height - 12) + 'px;' +
+          'background:#FFFFFF;' +
+          'border-radius:6px;' +
+          'border-left:4px solid ' + color + ';' +
+          'box-shadow:0 1px 3px rgba(15,23,42,0.06);' +
+          'padding:8px 12px;' +
+          'display:flex;' +
+          'align-items:center;' +
+          'gap:10px;' +
+          'font-family:Inter,system-ui,sans-serif;' +
+          'overflow:hidden;' +
+        '">' +
+          '<span style="' +
+            'display:inline-block;' +
+            'background:' + color + ';' +
+            'color:#FFFFFF;' +
+            'font-size:9px;' +
+            'font-weight:600;' +
+            'padding:2px 6px;' +
+            'border-radius:8px;' +
+            'text-transform:uppercase;' +
+            'letter-spacing:0.04em;' +
+            'flex-shrink:0;' +
+          '">' + label + '</span>' +
+          '<div style="min-width:0;">' +
+            '<div style="font-family:Outfit,Inter,system-ui,sans-serif; font-size:12px; font-weight:600; color:#0F172A; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + o.shortTitle + '</div>' +
+            '<div style="font-size:10px; color:#94A3B8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + o.department + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    // ── Build chart ──
+    let chart;
+    try {
+      console.log('d3-org-chart loaded:', typeof d3.OrgChart);
+      chart = new d3.OrgChart()
+        .container("#chart")
+        .data(data)
+        .nodeWidth(d => isCompact ? 220 : 280)
+        .nodeHeight(d => isCompact ? 70 : 140)
+        .childrenMargin(d => 40)
+        .siblingsMargin(d => 20)
+        .compactMarginBetween(d => 25)
+        .compactMarginPair(d => 50)
+        .nodeContent(d => isCompact ? compactNodeContent(d) : fullNodeContent(d))
+        .buttonContent(({ node, state }) => {
+          const subs = node.data._directSubordinates;
+          if (!subs) return "";
+          const expanded = node.children;
+          return '<div style="' +
+            'display:flex;' +
+            'align-items:center;' +
+            'justify-content:center;' +
+            'width:28px;' +
+            'height:22px;' +
+            'border-radius:5px;' +
+            'border:1px solid #CBD5E1;' +
+            'background:#FFFFFF;' +
+            'font-size:11px;' +
+            'font-family:Inter,system-ui,sans-serif;' +
+            'color:#334155;' +
+            'cursor:pointer;' +
+          '">' + (expanded ? "−" : "+") + " " + subs + '</div>';
+        })
+        .linkUpdate(function(d, i, arr) {
+          d3.select(this)
+            .attr("stroke", "#94A3B8")
+            .attr("stroke-width", 1.5)
+            .attr("stroke-opacity", 0.6);
+        })
+        .nodeUpdate(function(d, i, arr) {
+          d3.select(this)
+            .on("mouseenter", function(event) {
+              showTooltip(event, d.data);
+            })
+            .on("mousemove", function(event) {
+              if (tooltip.style.display === "block") positionTooltip(event);
+            })
+            .on("mouseleave", function() {
+              hideTooltip();
+            });
+        })
+        .render();
+
+      // Initial fit after a short delay for layout to settle
+      setTimeout(() => chart.fit(), 300);
+    } catch (e) {
+      console.error('Chart init failed:', e);
+      document.getElementById('chart').innerHTML =
+        '<p style="padding:40px;color:#DC2626;">Chart failed to load. Check browser console.</p>';
+    }
+
+    // ── Compact toggle ──
+    function toggleCompact() {
+      if (!chart) return;
+      isCompact = !isCompact;
+      const btn = document.getElementById("compactBtn");
+      btn.classList.toggle("active", isCompact);
+      btn.textContent = isCompact ? "Detailed" : "Compact";
+
+      chart
+        .nodeWidth(d => isCompact ? 220 : 280)
+        .nodeHeight(d => isCompact ? 70 : 140)
+        .nodeContent(d => isCompact ? compactNodeContent(d) : fullNodeContent(d))
+        .render()
+        .fit();
+    }
+
+    // ── Export ──
+    function exportChart() {
+      if (!chart) return;
+      chart.exportImg({
+        full: true,
+        save: true,
+        fileName: "Arctos-OrgChart"
+      });
+    }
+
+    // ── Resize handling ──
+    window.addEventListener("resize", function() {
+      setChartHeight();
+      if (chart) chart.fit();
+    });
+  </script>
+</body>
+</html>
